@@ -1,0 +1,91 @@
+import java.util.*;
+
+class Product {
+    String name;
+    double price;
+    int quantity;
+
+    // Default constructor
+    Product() {
+        this.name = "Unknown";
+        this.price = 0;
+        this.quantity = 0;
+    }
+
+    // Constructor with name and price
+    Product(String name, double price) {
+        this.name = name;
+        this.price = price;
+        this.quantity = 1;
+    }
+
+    // Constructor with all details (overloaded)
+    Product(String name, double price, int quantity) {
+        this.name = name;
+        this.price = price;
+        this.quantity = quantity;
+    }
+
+    double getTotalPrice() {
+        return price * quantity;
+    }
+}
+
+public class ECommerceOrder {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        List<Product> cart = new ArrayList<>();
+
+        // Preloaded products
+        cart.add(new Product("Laptop", 45000, 1));
+        cart.add(new Product("Mouse", 800));
+
+        // User input product
+        System.out.print("Enter product name: ");
+        String pname = sc.nextLine();
+        System.out.print("Enter price: ");
+        double pprice = sc.nextDouble();
+        System.out.print("Enter quantity: ");
+        int pqty = sc.nextInt();
+
+        cart.add(new Product(pname, pprice, pqty));
+
+        // Compute total
+        double total = 0;
+        System.out.println("\n--- Invoice ---");
+        for (Product p : cart) {
+            System.out.println(p.name + " (x" + p.quantity + ") = ₹" + p.getTotalPrice());
+            total += p.getTotalPrice();
+        }
+
+        // Apply discount
+        double discount = 0;
+        if (total > 5000) {
+            discount = total * 0.10;
+            total -= discount;
+        }
+
+        System.out.println("Discount Applied: ₹" + discount);
+        System.out.println("Final Total: ₹" + total);
+        System.out.println("Thank you for shopping with us!");
+
+        sc.close();
+    }
+}
+
+
+OUTPUT 
+Enter product name: Headphones
+Enter price: 2000
+Enter quantity: 2
+
+--- Invoice ---
+Laptop (x1) = ₹45000.0
+Mouse (x1) = ₹800.0
+Headphones (x2) = ₹4000.0
+Discount Applied: ₹4880.0
+Final Total: ₹43920.0
+Thank you for shopping with us!
+
+
