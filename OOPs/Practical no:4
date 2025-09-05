@@ -1,0 +1,41 @@
+Input:
+// Superclass
+class Vehicle {
+    void start() {
+        System.out.println("Vehicle is starting...");
+    }
+
+    void stop() {
+        System.out.println("Vehicle has stopped.");
+    }
+}
+
+// Subclass
+class Car extends Vehicle {
+    void honk() {
+        System.out.println("Car is honking!");
+    }
+}
+
+// Main class
+public class SingleInheritanceExample {
+    public static void main(String[] args) {
+        // Create object of subclass
+        Car myCar = new Car();
+
+        // Call methods from superclass
+        myCar.start();
+        myCar.stop();
+
+        // Call method from subclass
+        myCar.honk();
+    }
+}
+
+Output:
+Vehicle is starting...
+Vehicle has stopped.
+Car is honking!
+
+
+
