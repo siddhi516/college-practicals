@@ -1,92 +1,100 @@
 Input:
-import java.util.*;
+import java.util.Scanner;
 
-class Product {
-    String name;
-    double price;
-    int quantity;
-
-    // Default constructor
-    Product() {
-        this.name = "Unknown";
-        this.price = 0;
-        this.quantity = 0;
-    }
-
-    // Constructor with name and price
-    Product(String name, double price) {
-        this.name = name;
-        this.price = price;
-        this.quantity = 1;
-    }
-
-    // Constructor with all details (overloaded)
-    Product(String name, double price, int quantity) {
-        this.name = name;
-        this.price = price;
-        this.quantity = quantity;
-    }
-
-    double getTotalPrice() {
-        return price * quantity;
-    }
-}
-
-public class ECommerceOrder {
+public class HotelBookingSystem {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
-        List<Product> cart = new ArrayList<>();
+        // 2D array: 0 = available, 1 = booked
+        int[][] rooms = new int[3][5]; // 3 floors, 5 rooms per floor
 
-        // Preloaded products
-        cart.add(new Product("Laptop", 45000, 1));
-        cart.add(new Product("Mouse", 800));
+        while (true) {
+            System.out.println("\n--- HOTEL BOOKING MENU ---");
+            System.out.println("1. View Rooms");
+            System.out.println("2. Book a Room");
+            System.out.println("3. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = sc.nextInt();
 
-        // User input product
-        System.out.print("Enter product name: ");
-        String pname = sc.nextLine();
-        System.out.print("Enter price: ");
-        double pprice = sc.nextDouble();
-        System.out.print("Enter quantity: ");
-        int pqty = sc.nextInt();
+            switch (choice) {
+                case 1:
+                    System.out.println("\nRoom Status (0 = Available, 1 = Booked):");
+                    for (int i = 0; i < rooms.length; i++) {
+                        System.out.print("Floor " + (i + 1) + ": ");
+                        for (int j = 0; j < rooms[i].length; j++) {
+                            System.out.print(rooms[i][j] + " ");
+                        }
+                        System.out.println();
+                    }
+                    break;
 
-        cart.add(new Product(pname, pprice, pqty));
+                case 2:
+                    System.out.print("Enter floor number (1-3): ");
+                    int floor = sc.nextInt() - 1;
+                    System.out.print("Enter room number (1-5): ");
+                    int room = sc.nextInt() - 1;
 
-        // Compute total
-        double total = 0;
-        System.out.println("\n--- Invoice ---");
-        for (Product p : cart) {
-            System.out.println(p.name + " (x" + p.quantity + ") = ₹" + p.getTotalPrice());
-            total += p.getTotalPrice();
+                    if (floor >= 0 && floor < rooms.length && room >= 0 && room < rooms[floor].length) {
+                        if (rooms[floor][room] == 0) {
+                            rooms[floor][room] = 1;
+                            System.out.println("Room booked successfully!");
+                        } else {
+                            System.out.println("Sorry, this room is already booked.");
+                        }
+                    } else {
+                        System.out.println("Invalid floor or room number!");
+                    }
+                    break;
+
+                case 3:
+                    System.out.println("Exiting Hotel Booking System. Thank you!");
+                    sc.close();
+                    return;
+
+                default:
+                    System.out.println("Invalid choice. Please enter 1-3.");
+            }
         }
-
-        // Apply discount
-        double discount = 0;
-        if (total > 5000) {
-            discount = total * 0.10;
-            total -= discount;
-        }
-
-        System.out.println("Discount Applied: ₹" + discount);
-        System.out.println("Final Total: ₹" + total);
-        System.out.println("Thank you for shopping with us!");
-
-        sc.close();
     }
 }
 
 
-OUTPUT:
-Enter product name: Headphones
-Enter price: 2000
-Enter quantity: 2
+Output:
+--- HOTEL BOOKING MENU ---
+1. View Rooms
+2. Book a Room
+3. Exit
+Enter your choice: 1
 
---- Invoice ---
-Laptop (x1) = ₹45000.0
-Mouse (x1) = ₹800.0
-Headphones (x2) = ₹4000.0
-Discount Applied: ₹4880.0
-Final Total: ₹43920.0
-Thank you for shopping with us!
+Room Status (0 = Available, 1 = Booked):
+Floor 1: 0 0 0 0 0 
+Floor 2: 0 0 0 0 0 
+Floor 3: 0 0 0 0 0 
 
+--- HOTEL BOOKING MENU ---
+1. View Rooms
+2. Book a Room
+3. Exit
+Enter your choice: 2
+Enter floor number (1-3): 2
+Enter room number (1-5): 3
+Room booked successfully!
+
+--- HOTEL BOOKING MENU ---
+1. View Rooms
+2. Book a Room
+3. Exit
+Enter your choice: 1
+
+Room Status (0 = Available, 1 = Booked):
+Floor 1: 0 0 0 0 0 
+Floor 2: 0 0 1 0 0 
+Floor 3: 0 0 0 0 0 
+
+--- HOTEL BOOKING MENU ---
+1. View Rooms
+2. Book a Room
+3. Exit
+Enter your choice: 3
+Exiting Hotel Booking System. Thank you!
 
