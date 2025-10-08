@@ -1,0 +1,76 @@
+INPUT:
+
+# Hash Table implementation with Chaining
+class HashTable:
+    def __init__(self, size=10):
+        self.size = size
+        self.table = [[] for _ in range(size)]  
+
+    def hash_function(self, key):
+        return key % self.size
+
+    def insert(self, key, value):
+        index = self.hash_function(key)
+        for pair in self.table[index]:
+            if pair[0] == key:
+                pair[1] = value
+                return
+        self.table[index].append([key, value])
+
+    def search(self, key):
+        index = self.hash_function(key)
+        for pair in self.table[index]:
+            if pair[0] == key:
+                return pair[1]
+        return None  
+
+    def delete(self, key):
+        index = self.hash_function(key)
+        for i, pair in enumerate(self.table[index]):
+            if pair[0] == key:
+                del self.table[index][i] 
+                return True
+        return False  
+
+    def display(self):
+        for i, bucket in enumerate(self.table):
+            if bucket:
+                print(f"Index {i}: {bucket}")
+
+ht = HashTable()
+
+print("--- Inserts ---")
+ht.insert(15, "Apple")    
+ht.insert(25, "Banana")   
+ht.insert(7, "Mango")     
+ht.insert(37, "Grape")    
+ht.insert(2, "Orange")    
+
+ht.display()
+
+print("\n--- Search Results ---")
+print("Search 25:", ht.search(25))
+print("Search 42:", ht.search(42))
+
+print("\n--- Deletion and Final Display ---")
+print("Deleting 15:", ht.delete(15)) 
+print("Deleting 42:", ht.delete(42)) 
+
+ht.display()
+
+
+OUTPUT:
+
+--- Initial Inserts ---
+Index 5: [[15, 'Apple'], [25, 'Banana']]
+Index 7: [[7, 'Mango']]
+
+--- Search Results ---
+Search 25: Banana
+Search 100: None
+
+--- Deletion and Final Display ---
+Deleting 15: True
+Deleting 99: False
+Index 5: [[25, 'Banana']]
+Index 7: [[7, 'Mango']]
