@@ -1,0 +1,124 @@
+INPUT:
+
+class HashTable:
+    def __init__(self, size):
+        # Initialize the table size
+        self.size = size
+        self.table = [None] * size
+
+    def hash_function(self, key):
+        return key % self.size
+
+    def insert(self, key):
+        index = self.hash_function(key)
+        start_index = index
+
+        while self.table[index] is not None and self.table[index] != "DELETED":
+            index = (index + 1) % self.size
+            
+            if index == start_index:
+                print(" Hash table is full. Cannot insert", key)
+                return
+            
+        self.table[index] = key
+
+    def search(self, key):
+        index = self.hash_function(key)
+        start_index = index
+
+        while self.table[index] is not None:
+            if self.table[index] == key:
+                return index  
+           
+            index = (index + 1) % self.size
+
+            if index == start_index: 
+                break 
+                
+        return -1 
+
+    def delete(self, key):
+        index = self.search(key)
+        if index == -1:
+            print(f" Key {key} not found.")
+        else:
+            self.table[index] = "DELETED"
+            print(f" Key {key} deleted at index {index}.")
+
+    def display(self):
+        print("--- Current Hash Table State ---")
+        for i in range(self.size):
+            print(f"Index {i:2}: {self.table[i]}")
+        print("--------------------------------")
+
+# 1. Initialize the Hash Table
+ht = HashTable(7) 
+
+print("--- Initial Insertions (Size 7) ---")
+ht.insert(10)
+ht.insert(20)
+ht.insert(15)
+ht.insert(7)
+
+# 2. Display after insertions
+print("\nHash Table after insertions:")
+ht.display()
+
+# 3. Search operations
+print("\n--- Search Results ---")
+search_key_1 = 15
+result_1 = ht.search(search_key_1)
+print(f"Searching {search_key_1}: {'Found at index ' + str(result_1) if result_1 != -1 else 'Not Found'}")
+
+search_key_2 = 99
+result_2 = ht.search(search_key_2)
+print(f"Searching {search_key_2}: {'Found at index ' + str(result_2) if result_2 != -1 else 'Not Found'}")
+
+# 4. Deletion
+print("\n--- Deletion ---")
+ht.delete(20)
+
+# 5. Display after deletion
+print("\nHash Table after deleting 20:")
+ht.display()
+
+# 6. Search for the deleted item (should fail)
+print("\n--- Search After Deletion ---")
+result_3 = ht.search(20)
+print(f"Searching 20: {'Found at index ' + str(result_3) if result_3 != -1 else 'Not Found'}")
+
+OUTPUT:
+
+--- Initial Insertions (Size 7) ---
+
+Hash Table after insertions:    
+--- Current Hash Table State ---
+Index  0: 7
+Index  1: 15
+Index  2: None
+Index  3: 10
+Index  4: None
+Index  5: None
+Index  6: 20
+--------------------------------
+
+--- Search Results ---
+Searching 15: Found at index 1
+Searching 99: Not Found
+
+--- Deletion ---
+ Key 20 deleted at index 6.
+
+Hash Table after deleting 20:
+--- Current Hash Table State ---
+Index  0: 7
+Index  1: 15
+Index  2: None
+Index  3: 10
+Index  4: None
+Index  5: None
+Index  6: DELETED
+--------------------------------
+
+--- Search After Deletion ---
+Searching 20: Not Found
