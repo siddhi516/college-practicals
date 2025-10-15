@@ -1,0 +1,131 @@
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+
+public class Transform2D extends JPanel implements ActionListener {
+    // Original square coordinates
+    int[] x = {100, 200, 200, 100};
+    int[] y = {100, 100, 200, 200};
+
+    String transformation = "None";
+
+    public Transform2D() {
+        JFrame f = new JFrame("2D Transformations");
+        f.setSize(600, 600);
+        f.add(this);
+
+        JPanel p = new JPanel();
+        String[] ops = {"Translation", "Rotation", "Scaling", "Shearing"};
+        JComboBox<String> combo = new JComboBox<>(ops);
+        JButton apply = new JButton("Apply");
+
+        p.add(new JLabel("Choose Transformation:"));
+        p.add(combo);
+        p.add(apply);
+        f.add(p, BorderLayout.SOUTH);
+
+        combo.addActionListener(e -> transformation = (String) combo.getSelectedItem());
+        apply.addActionListener(this);
+
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f.setVisible(true);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        repaint();
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        Graphics2D g2 = (Graphics2D) g;
+
+        // Draw original square (Black)
+        g2.setColor(Color.BLACK);
+        g2.drawPolygon(x, y, 4);
+        g2.drawString("Original Object", 80, 90);
+
+        // Copy arrays
+        int[] tx = x.clone();
+        int[] ty = y.clone();
+
+        switch (transformation) {
+            case "Translation":
+                translate(tx, ty, 100, 50);
+                g2.setColor(Color.RED);
+                g2.drawPolygon(tx, ty, 4);
+                g2.drawString("Translated", 200, 80);
+                break;
+
+            case "Rotation":
+                rotate(tx, ty, 45);
+                g2.setColor(Color.BLUE);
+                g2.drawPolygon(tx, ty, 4);
+                g2.drawString("Rotated (45°)", 200, 80);
+                break;
+
+            case "Scaling":
+                scale(tx, ty, 1.5, 1.5);
+                g2.setColor(Color.GREEN);
+                g2.drawPolygon(tx, ty, 4);
+                g2.drawString("Scaled (1.5x)", 200, 80);
+                break;
+
+            case "Shearing":
+                shear(tx, ty, 0.5, 0);
+                g2.setColor(Color.MAGENTA);
+                g2.drawPolygon(tx, ty, 4);
+                g2.drawString("Sheared (X-axis)", 200, 80);
+                break;
+        }
+
+        // Draw axes
+        g2.setColor(Color.GRAY);
+        g2.drawLine(0, 300, 600, 300);
+        g2.drawLine(300, 0, 300, 600);
+    }
+
+    // ---------- Transformations ----------
+
+    // Translation
+    void translate(int[] x, int[] y, int tx, int ty) {
+        for (int i = 0; i < x.length; i++) {
+            x[i] += tx;
+            y[i] += ty;
+        }
+    }
+
+    // Rotation about origin
+    void rotate(int[] x, int[] y, double angle) {
+        double rad = Math.toRadians(angle);
+        for (int i = 0; i < x.length; i++) {
+            int X = x[i] - 150;
+            int Y = y[i] - 150;
+            x[i] = (int) (150 + (X * Math.cos(rad) - Y * Math.sin(rad)));
+            y[i] = (int) (150 + (X * Math.sin(rad) + Y * Math.cos(rad)));
+        }
+    }
+
+    // Scaling
+    void scale(int[] x, int[] y, double sx, double sy) {
+        for (int i = 0; i < x.length; i++) {
+            x[i] = (int) (x[i] * sx);
+            y[i] = (int) (y[i] * sy);
+        }
+    }
+
+    // Shearing (about X and Y)
+    void shear(int[] x, int[] y, double shx, double shy) {
+        for (int i = 0; i < x.length; i++) {
+            int X = x[i];
+            int Y = y[i];
+            x[i] = (int) (X + shx * Y);
+            y[i] = (int) (Y + shy * X);
+        }
+    }
+
+    public static void main(String[] args) {
+        new Transform2D();
+    }
+}
