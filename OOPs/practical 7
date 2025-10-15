@@ -1,0 +1,106 @@
+
+import java.awt.*;
+import javax.swing.*;
+
+public class CohenSutherland extends JPanel {
+    // Window boundaries
+    final int xmin = 100, ymin = 100, xmax = 400, ymax = 300;
+
+    // Region codes
+    final int INSIDE = 0; // 0000
+    final int LEFT   = 1; // 0001
+    final int RIGHT  = 2; // 0010
+    final int BOTTOM = 4; // 0100
+    final int TOP    = 8; // 1000
+
+    // Line endpoints (can be changed)
+    int x1 = 50, y1 = 150, x2 = 450, y2 = 350;
+
+    // Function to compute region code for a point (x, y)
+    int computeCode(int x, int y) {
+        int code = INSIDE;
+        if (x < xmin) code |= LEFT;
+        else if (x > xmax) code |= RIGHT;
+        if (y < ymin) code |= BOTTOM;
+        else if (y > ymax) code |= TOP;
+        return code;
+    }
+
+    // Cohen–Sutherland clipping algorithm
+    void cohenSutherlandClip(Graphics g) {
+        int code1 = computeCode(x1, y1);
+        int code2 = computeCode(x2, y2);
+        boolean accept = false;
+
+        int x1c = x1, y1c = y1, x2c = x2, y2c = y2;
+
+        while (true) {
+            if ((code1 | code2) == 0) { // both inside
+                accept = true;
+                break;
+            } else if ((code1 & code2) != 0) { // both outside
+                break;
+            } else {
+                int codeOut;
+                int x = 0, y = 0;
+
+                if (code1 != 0) codeOut = code1;
+                else codeOut = code2;
+
+                if ((codeOut & TOP) != 0) {
+                    x = x1c + (x2c - x1c) * (ymax - y1c) / (y2c - y1c);
+                    y = ymax;
+                } else if ((codeOut & BOTTOM) != 0) {
+                    x = x1c + (x2c - x1c) * (ymin - y1c) / (y2c - y1c);
+                    y = ymin;
+                } else if ((codeOut & RIGHT) != 0) {
+                    y = y1c + (y2c - y1c) * (xmax - x1c) / (x2c - x1c);
+                    x = xmax;
+                } else if ((codeOut & LEFT) != 0) {
+                    y = y1c + (y2c - y1c) * (xmin - x1c) / (x2c - x1c);
+                    x = xmin;
+                }
+
+                if (codeOut == code1) {
+                    x1c = x; y1c = y;
+                    code1 = computeCode(x1c, y1c);
+                } else {
+                    x2c = x; y2c = y;
+                    code2 = computeCode(x2c, y2c);
+                }
+            }
+        }
+
+        // Draw clipping window
+        g.setColor(Color.BLACK);
+        g.drawRect(xmin, ymin, xmax - xmin, ymax - ymin);
+
+        // Draw original line
+        g.setColor(Color.RED);
+        g.drawLine(x1, y1, x2, y2);
+
+        // Draw clipped line if accepted
+        if (accept) {
+            g.setColor(Color.GREEN);
+            g.drawLine(x1c, y1c, x2c, y2c);
+            g.drawString("Clipped Line (Green)", 150, 80);
+        } else {
+            g.setColor(Color.BLUE);
+            g.drawString("Line rejected (outside window)", 150, 80);
+        }
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        cohenSutherlandClip(g);
+    }
+
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Cohen–Sutherland Line Clipping");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(600, 500);
+        frame.add(new CohenSutherland());
+        frame.setVisible(true);
+    }
+}
