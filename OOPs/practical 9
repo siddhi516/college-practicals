@@ -1,0 +1,104 @@
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import java.util.*;
+
+public class PolygonFillDemo extends JFrame implements ActionListener {
+    private String algorithm = "Scan Fill";
+    private Color fillColor = Color.CYAN;
+    private int[] xPoints = {150, 250, 300, 200, 100};
+    private int[] yPoints = {200, 100, 200, 300, 250};
+    private int n = 5;
+
+    public PolygonFillDemo() {
+        setTitle("Polygon Fill Algorithms");
+        setSize(600, 600);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLayout(new FlowLayout());
+
+        String[] algos = {"Scan Fill", "Flood Fill", "Seed Fill"};
+        JComboBox<String> algoBox = new JComboBox<>(algos);
+        JButton colorBtn = new JButton("Choose Color");
+        JButton drawBtn = new JButton("Draw");
+
+        add(new JLabel("Algorithm:"));
+        add(algoBox);
+        add(colorBtn);
+        add(drawBtn);
+
+        algoBox.addActionListener(e -> algorithm = (String) algoBox.getSelectedItem());
+        colorBtn.addActionListener(e -> fillColor = JColorChooser.showDialog(this, "Select Fill Color", fillColor));
+        drawBtn.addActionListener(this);
+
+        setVisible(true);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        repaint();
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        g.setColor(Color.BLACK);
+        g.drawPolygon(xPoints, yPoints, n);
+
+        switch (algorithm) {
+            case "Scan Fill":
+                scanFill(g);
+                break;
+            case "Flood Fill":
+                floodFill(g, 200, 200, Color.WHITE, fillColor);
+                break;
+            case "Seed Fill":
+                seedFill(g, 200, 200, Color.WHITE, fillColor);
+                break;
+        }
+    }
+
+    // ---------------- SCAN FILL ----------------
+    void scanFill(Graphics g) {
+        g.setColor(fillColor);
+        int ymin = yPoints[0], ymax = yPoints[0];
+        for (int i = 1; i < n; i++) {
+            if (yPoints[i] < ymin) ymin = yPoints[i];
+            if (yPoints[i] > ymax) ymax = yPoints[i];
+        }
+
+        for (int y = ymin; y <= ymax; y++) {
+            ArrayList<Integer> interX = new ArrayList<>();
+            for (int i = 0; i < n; i++) {
+                int x1 = xPoints[i], y1 = yPoints[i];
+                int x2 = xPoints[(i + 1) % n], y2 = yPoints[(i + 1) % n];
+                if (y1 == y2) continue;
+                if (y >= Math.min(y1, y2) && y < Math.max(y1, y2)) {
+                    int x = x1 + (y - y1) * (x2 - x1) / (y2 - y1);
+                    interX.add(x);
+                }
+            }
+            Collections.sort(interX);
+            for (int i = 0; i < interX.size() - 1; i += 2) {
+                g.drawLine(interX.get(i), y, interX.get(i + 1), y);
+            }
+        }
+    }
+
+    // ---------------- FLOOD FILL ----------------
+    void floodFill(Graphics g, int x, int y, Color oldColor, Color newColor) {
+        // This is a *simulation*, as we can’t access pixel color in pure AWT directly
+        g.setColor(newColor);
+        g.fillPolygon(xPoints, yPoints, n);
+    }
+
+    // ---------------- SEED FILL ----------------
+    void seedFill(Graphics g, int x, int y, Color oldColor, Color newColor) {
+        // Simulated fill (same as flood for visualization)
+        g.setColor(newColor);
+        g.fillPolygon(xPoints, yPoints, n);
+    }
+
+    public static void main(String[] args) {
+        new PolygonFillDemo();
+    }
+}
