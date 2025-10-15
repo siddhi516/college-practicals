@@ -1,0 +1,108 @@
+
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+
+public class CircleDrawing extends JFrame implements ActionListener {
+    private String algorithm = "DDA";
+    private String style = "Solid";
+
+    public CircleDrawing() {
+        setTitle("Circle Drawing Algorithms");
+        setSize(600, 600);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLayout(new FlowLayout());
+
+        // Menu
+        String[] algos = {"DDA", "Bresenham", "Midpoint"};
+        String[] styles = {"Solid", "Dotted", "Dashed"};
+
+        JComboBox<String> algoBox = new JComboBox<>(algos);
+        JComboBox<String> styleBox = new JComboBox<>(styles);
+        JButton drawBtn = new JButton("Draw");
+
+        add(new JLabel("Algorithm:"));
+        add(algoBox);
+        add(new JLabel("Style:"));
+        add(styleBox);
+        add(drawBtn);
+
+        algoBox.addActionListener(e -> algorithm = (String) algoBox.getSelectedItem());
+        styleBox.addActionListener(e -> style = (String) styleBox.getSelectedItem());
+        drawBtn.addActionListener(this);
+
+        setVisible(true);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        repaint();
+    }
+
+    public void paint(Graphics g) {
+        super.paint(g);
+        int xc = 300, yc = 300, r = 100;
+        switch (algorithm) {
+            case "DDA": drawCircleDDA(g, xc, yc, r); break;
+            case "Bresenham": drawCircleBresenham(g, xc, yc, r); break;
+            case "Midpoint": drawCircleMidpoint(g, xc, yc, r); break;
+        }
+    }
+
+    // ---------------------- DDA Circle ----------------------
+    void drawCircleDDA(Graphics g, int xc, int yc, int r) {
+        double x = 0, y = r;
+        double step = 1.0 / Math.max(Math.abs(x), Math.abs(y));
+        int i = 0;
+        while (x <= y) {
+            if (style.equals("Solid") || (style.equals("Dotted") && i % 8 == 0) || (style.equals("Dashed") && i % 3 != 0))
+                drawSymmetricPoints(g, xc, yc, (int)x, (int)y);
+            double xnew = x + step * y;
+            double ynew = y - step * x;
+            x = xnew; y = ynew;
+            i++;
+        }
+    }
+
+    // ---------------------- Bresenham’s Circle ----------------------
+    void drawCircleBresenham(Graphics g, int xc, int yc, int r) {
+        int x = 0, y = r;
+        int d = 3 - 2 * r, i = 0;
+        while (x <= y) {
+            if (style.equals("Solid") || (style.equals("Dotted") && i % 8 == 0) || (style.equals("Dashed") && i % 3 != 0))
+                drawSymmetricPoints(g, xc, yc, x, y);
+            if (d < 0) d = d + 4 * x + 6;
+            else { d = d + 4 * (x - y) + 10; y--; }
+            x++; i++;
+        }
+    }
+
+    // ---------------------- Midpoint Circle ----------------------
+    void drawCircleMidpoint(Graphics g, int xc, int yc, int r) {
+        int x = 0, y = r;
+        int p = 1 - r, i = 0;
+        while (x <= y) {
+            if (style.equals("Solid") || (style.equals("Dotted") && i % 8 == 0) || (style.equals("Dashed") && i % 3 != 0))
+                drawSymmetricPoints(g, xc, yc, x, y);
+            x++;
+            if (p < 0) p += 2 * x + 1;
+            else { y--; p += 2 * (x - y) + 1; }
+            i++;
+        }
+    }
+
+    void drawSymmetricPoints(Graphics g, int xc, int yc, int x, int y) {
+        g.fillRect(xc + x, yc + y, 2, 2);
+        g.fillRect(xc - x, yc + y, 2, 2);
+        g.fillRect(xc + x, yc - y, 2, 2);
+        g.fillRect(xc - x, yc - y, 2, 2);
+        g.fillRect(xc + y, yc + x, 2, 2);
+        g.fillRect(xc - y, yc + x, 2, 2);
+        g.fillRect(xc + y, yc - x, 2, 2);
+        g.fillRect(xc - y, yc - x, 2, 2);
+    }
+
+    public static void main(String[] args) {
+        new CircleDrawing();
+    }
+}
