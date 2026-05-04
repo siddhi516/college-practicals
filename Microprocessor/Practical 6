@@ -1,0 +1,168 @@
+; Write a switch case driven X86/64 ALP to perform 64 bit hexadecimal arithmetic operations (+,-,*,/)
+; using suitable macros. Define procedure for each operation
+
+%macro scall 4
+    mov rax, %1
+    mov rdi, %2
+    mov rsi, %3
+    mov rdx, %4
+    syscall
+%endmacro
+
+section .data
+    arr dq 3h, 2h
+    n equ 2
+
+    menu db 10,13,"************MENU************",10,13,\
+            "1. Addition",10,13,\
+            "2. Subtraction",10,13,\
+            "3. Multiplication",10,13,\
+            "4. Division",10,13,\
+            "5. Exit",10,13,\
+            "Enter your Choice: "
+    menu_len equ $-menu
+
+    m1 db 10,13,"Addition: "
+    l1 equ $-m1
+
+    m2 db 10,13,"Subtraction: "
+    l2 equ $-m2
+
+    m3 db 10,13,"Multiplication: "
+    l3 equ $-m3
+
+    m4 db 10,13,"Division: "
+    l4 equ $-m4
+
+section .bss
+    answer resb 16
+    choice resb 2
+
+section .text
+    global _start
+
+_start:
+
+up:
+    scall 1,1,menu,menu_len
+    scall 0,0,choice,2
+
+    cmp byte [choice],'1'
+    je case1
+    cmp byte [choice],'2'
+    je case2
+    cmp byte [choice],'3'
+    je case3
+    cmp byte [choice],'4'
+    je case4
+    cmp byte [choice],'5'
+    je case5
+    jmp up
+
+case1:
+    scall 1,1,m1,l1
+    call addition
+    jmp up
+
+case2:
+    scall 1,1,m2,l2
+    call subtraction
+    jmp up
+
+case3:
+    scall 1,1,m3,l3
+    call multiplication
+    jmp up
+
+case4:
+    scall 1,1,m4,l4
+    call division
+    jmp up
+
+case5:
+    mov rax,60
+    mov rdi,0
+    syscall
+
+; ---------------- PROCEDURES ----------------
+
+addition:
+    mov rcx,n
+    dec rcx
+    mov rsi,arr
+    mov rax,[rsi]
+
+up1:
+    add rsi,8
+    mov rbx,[rsi]
+    add rax,rbx
+    loop up1
+    call display
+    ret
+
+subtraction:
+    mov rcx,n
+    dec rcx
+    mov rsi,arr
+    mov rax,[rsi]
+
+up2:
+    add rsi,8
+    mov rbx,[rsi]
+    sub rax,rbx
+    loop up2
+    call display
+    ret
+
+multiplication:
+    mov rcx,n
+    dec rcx
+    mov rsi,arr
+    mov rax,[rsi]
+
+up3:
+    add rsi,8
+    mov rbx,[rsi]
+    mul rbx
+    loop up3
+    call display
+    ret
+
+division:
+    mov rcx,n
+    dec rcx
+    mov rsi,arr
+    mov rax,[rsi]
+
+up4:
+    add rsi,8
+    mov rbx,[rsi]
+    xor rdx,rdx
+    div rbx
+    loop up4
+    call display
+    ret
+
+; -------- DISPLAY RESULT (HEX) --------
+
+display:
+    mov rsi,answer+15
+    mov rcx,16
+
+cnt:
+    xor rdx,rdx
+    mov rbx,16
+    div rbx
+    cmp dl,9
+    jbe add30
+    add dl,7
+
+add30:
+    add dl,30h
+    mov [rsi],dl
+    dec rsi
+    dec rcx
+    jnz cnt
+
+    scall 1,1,answer,16
+    ret
