@@ -1,0 +1,69 @@
+; TITLE: DISPLAY STRING AND STRING LENGTH
+; PROBLRM STATEMENT: write an X86/64 ALP to accept a string and display its length.
+
+section .data
+    M2 db 10,10,"Enter the String: "
+    M2_len equ $-M2
+
+    M3 db "Length of string: "
+    M3_len equ $-M3
+
+section .bss
+    srcstr  resb 20
+    count   resb 1
+    dispbuff resd 2
+
+%macro disp 2
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, %1
+    mov edx, %2
+    int 80h
+%endmacro
+
+%macro acceptstr 1
+    mov eax, 3
+    mov ebx, 0
+    mov ecx, %1
+    mov edx, 20
+    int 80h
+%endmacro
+
+section .text
+    global _start
+
+_start:
+    disp M2, M2_len
+    acceptstr srcstr
+
+    dec al
+    mov [count], al
+
+    disp M3, M3_len
+    mov bl, [count]
+    call display
+
+    mov eax, 1
+    int 80h
+
+display:
+    mov cl, 2
+    mov edi, dispbuff
+
+d1:
+    rol bl, 4
+    mov al, bl
+    and al, 0Fh
+    cmp al, 09h
+    jbe d2
+    add al, 07h
+
+d2:
+    add al, 30h
+    mov [edi], al
+    inc edi
+    dec cl
+    jnz d1
+
+    disp dispbuff, 2
+    ret
