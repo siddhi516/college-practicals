@@ -1,0 +1,80 @@
+section .data
+    msg1 db 10,13,'count of positive nos '
+    len1 equ $-msg1
+
+    msg2 db 10,13,'count of negative nos '
+    len2 equ $-msg2
+
+    array db 10,12,-21,-12,-19,-34,41
+
+%macro print 2
+    mov rax,1
+    mov rdi,1
+    mov rsi,%1
+    mov rdx,%2
+    syscall
+%endmacro
+
+section .bss
+    count       resb 2
+    pcount      resb 2
+    ncount      resb 2
+    totalcount  resb 2
+
+section .text
+    global _start
+
+_start:
+    mov byte [count],07
+    mov byte [pcount],00
+    mov byte [ncount],00
+
+    mov rsi,array
+
+up:
+    mov al,[rsi]
+    test al,al
+    js neg
+
+    inc byte [pcount]
+    jmp down
+
+neg:
+    inc byte [ncount]
+
+down:
+    inc rsi
+    dec byte [count]
+    jnz up
+
+    print msg1,len1
+    mov bh,[pcount]
+    call disp
+
+    print msg2,len2
+    mov bh,[ncount]
+    call disp
+
+    mov rax,60
+    xor rdi,rdi
+    syscall
+
+disp:
+    mov byte [count],2
+
+loop1:
+    rol bh,04
+    mov al,bh
+    and al,0Fh
+    cmp al,09
+    jbe i1
+    add al,07
+
+i1:
+    add al,30h
+    mov [totalcount],al
+    print totalcount,01
+
+    dec byte [count]
+    jnz loop1
+    ret
